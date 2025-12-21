@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>مولّد توثيق MLA 9</title>
+<style>
+body { font-family: "Arial", sans-serif; margin: 20px; background: #f0f4f8; }
+.container { background: #fff; padding: 25px; border-radius: 10px; max-width: 750px; margin: auto; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+h1 { text-align: center; color: #007bff; }
+label { display: block; margin-top: 15px; font-weight: bold; }
+small { display: block; color: #555; margin-top: 2px; }
+input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+button { margin-top: 20px; padding: 12px 20px; border: none; border-radius: 6px; background: #007bff; color: #fff; font-size: 16px; cursor: pointer; }
+button:hover { background: #0056b3; }
+.output { background: #e9ecef; padding: 12px; margin-top: 12px; border-radius: 6px; white-space: pre-wrap; min-height: 30px; }
+.copy-btn { background: #28a745; margin-left: 10px; }
+.copy-btn:hover { background: #1e7e34; }
+.flex { display: flex; align-items: center; }
+.flex button { flex: 0 0 auto; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>مولّد توثيق MLA 9</h1>
+
+<label>نوع المصدر:</label>
+<select id="sourceType">
+<option value="book">كتاب</option>
+<option value="bookChapter">فصل في كتاب</option>
+<option value="article">مقال في مجلة/صحيفة</option>
+<option value="website">موقع إلكتروني</option>
+<option value="video">فيديو</option>
+<option value="thesis">رسالة ماجستير / أطروحة دكتوراه</option>
+</select>
+<small>اختر نوع المصدر لتحديد الحقول المطلوبة.</small>
+
+<label>اسم المؤلف/المؤلفين:</label>
+<input type="text" id="author" placeholder="مثال: أحمد الحموي أو John Smith">
+<small>أدخل اسم المؤلف كامل. إذا كان أكثر من مؤلف ضع فاصلة بين الأسماء.</small>
+
+<label>عنوان المصدر:</label>
+<input type="text" id="title" placeholder="عنوان الكتاب أو المقال أو الموقع">
+<small>اكتب عنوان المصدر كما هو مكتوب.</small>
+
+<label>اسم الناشر/المجلة/الجامعة:</label>
+<input type="text" id="publisher" placeholder="مثال: دار النشر أو مجلة العلوم">
+<small>اسم الجهة الناشرة أو المجلة أو الجامعة.</small>
+
+<label>السنة:</label>
+<input type="text" id="year" placeholder="مثال: 2023">
+<small>سنة النشر أو الإصدار.</small>
+
+<label>رابط المصدر (إن وجد):</label>
+<input type="text" id="url" placeholder="مثال: https://example.com">
+<small>ضع رابط المصدر الإلكتروني إن كان متوفرًا، وإلا اتركه فارغًا.</small>
+
+<label>رقم الصفحة (للاقتباس المباشر، إن وجد):</label>
+<input type="text" id="page" placeholder="مثال: 45">
+<small>اختياري، يستخدم في الاقتباسات داخل النص.</small>
+
+<button onclick="generateCitation()">توليد التوثيق</button>
+
+<h3>In-text citation:</h3>
+<div class="flex">
+<div id="inText" class="output"></div>
+<button class="copy-btn" onclick="copyText('inText')">نسخ</button>
+</div>
+
+<h3>Works Cited:</h3>
+<div class="flex">
+<div id="worksCited" class="output"></div>
+<button class="copy-btn" onclick="copyText('worksCited')">نسخ</button>
+</div>
+
+</div>
+
+<script>
+function generateCitation() {
+    let type = document.getElementById('sourceType').value;
+    let author = document.getElementById('author').value.trim();
+    let title = document.getElementById('title').value.trim();
+    let publisher = document.getElementById('publisher').value.trim();
+    let year = document.getElementById('year').value.trim();
+    let url = document.getElementById('url').value.trim();
+    let page = document.getElementById('page').value.trim();
+
+    // In-text citation
+    let lastName = author.split(' ').slice(-1)[0];
+    let inText = page ? `(${lastName} ${page})` : `(${lastName})`;
+    document.getElementById('inText').textContent = inText;
+
+    // Works Cited
+    let wc = '';
+    switch(type) {
+        case 'book':
+            wc = `${author}. ${title}. ${publisher}, ${year}.`;
+            break;
+        case 'bookChapter':
+            wc = `${author}. "${title}." في كتاب ${publisher}, سنة ${year}.`;
+            break;
+        case 'article':
+            wc = `${author}. "${title}." ${publisher}, ${year}.`;
+            break;
+        case 'website':
+            wc = `${author}. "${title}." ${publisher}, ${year}, ${url}.`;
+            break;
+        case 'video':
+            wc = `${author}. "${title}." ${publisher}, ${year}, ${url}.`;
+            break;
+        case 'thesis':
+            wc = `${author}. "${title}." ${publisher}, ${year}.`;
+            break;
+        default:
+            wc = `${author}. ${title}. ${publisher}, ${year}.`;
+    }
+
+    document.getElementById('worksCited').textContent = wc;
+}
+
+function copyText(id) {
+    let text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("تم النسخ!");
+    });
+}
+</script>
+</body>
+</html>
