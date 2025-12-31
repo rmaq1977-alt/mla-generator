@@ -7,48 +7,43 @@
 <style>
 body {
     font-family: Arial, sans-serif;
-    background: #f0f4f8;
-    margin: 0;
-    padding: 0;
+    background: #f4f6f9;
 }
 .container {
-    max-width: 900px;
+    max-width: 950px;
     margin: 40px auto;
     background: #fff;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    padding: 35px;
+    border-radius: 12px;
 }
-h1 { text-align: center; color: #007bff; }
-label { font-weight: bold; margin-top: 15px; display: block; }
-small { color: #555; display: block; }
+h1 {
+    text-align: center;
+    color: #004085;
+}
+label {
+    font-weight: bold;
+    margin-top: 15px;
+    display: block;
+}
 input, select {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
 }
 button {
-    margin-top: 25px;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    background: #007bff;
+    margin-top: 20px;
+    padding: 12px;
+    background: #004085;
     color: #fff;
+    border: none;
+    width: 100%;
     font-size: 16px;
-    cursor: pointer;
 }
 .output {
-    background: #e9ecef;
-    padding: 12px;
-    border-radius: 8px;
+    background: #eef1f5;
+    padding: 15px;
     margin-top: 10px;
-    min-height: 40px;
-}
-.flex {
-    display: flex;
-    gap: 10px;
+    border-radius: 8px;
 }
 </style>
 </head>
@@ -56,85 +51,124 @@ button {
 <body>
 <div class="container">
 
-<h1>مولّد توثيق MLA 9</h1>
+<h1>مولّد التوثيق MLA 9</h1>
 
-<label>نوع المصدر:</label>
-<select id="sourceType">
+<label>نوع المرجع</label>
+<select id="type">
     <option value="book">كتاب</option>
-    <option value="article">مقال علمي</option>
-    <option value="newspaper">صحيفة</option>
-    <option value="website">موقع إلكتروني</option>
-    <option value="video">فيديو / محاضرة</option>
+    <option value="chapter">فصل من كتاب</option>
+    <option value="ebook">كتاب إلكتروني</option>
+    <option value="article">مقال / صحيفة</option>
+    <option value="website">صفحة ويب</option>
+    <option value="tweet">تغريدة</option>
+    <option value="video">مادة سمعية/بصرية</option>
 </select>
 
-<label>اسم العائلة للمؤلف الأول:</label>
-<input type="text" id="lastName" placeholder="مثال: الحموي">
+<label>اسم العائلة للمؤلف الأول</label>
+<input id="lastName">
 
-<label>الاسم الأول للمؤلف الأول:</label>
-<input type="text" id="firstName" placeholder="مثال: أحمد">
+<label>الاسم الأول للمؤلف الأول</label>
+<input id="firstName">
 
-<label>عدد المؤلفين:</label>
-<select id="authorCount">
+<label>عدد المؤلفين</label>
+<select id="authorsCount">
     <option value="1">مؤلف واحد</option>
     <option value="2">مؤلفان</option>
-    <option value="3">3 مؤلفين فأكثر</option>
+    <option value="3">ثلاثة فأكثر</option>
 </select>
 
-<label>عنوان المصدر:</label>
-<input type="text" id="title">
+<label>عنوان المصدر</label>
+<input id="title">
 
-<label>الناشر / المجلة:</label>
-<input type="text" id="publisher">
+<label>عنوان الفصل / المقال (إن وجد)</label>
+<input id="chapter">
 
-<label>السنة:</label>
-<input type="text" id="year">
+<label>الناشر / الموقع</label>
+<input id="publisher">
 
-<label>رقم الصفحة (إن وجد):</label>
-<input type="text" id="page">
+<label>السنة</label>
+<input id="year">
 
-<button onclick="generateCitation()">توليد التوثيق</button>
+<label>رقم الصفحة (للاقتباس داخل النص)</label>
+<input id="page">
 
-<h3>In-text citation</h3>
-<div class="output" id="inText"></div>
+<label>الرابط (إن وجد)</label>
+<input id="url">
 
-<h3>Works Cited</h3>
-<div class="output" id="worksCited"></div>
+<button onclick="generate()">توليد التوثيق</button>
+
+<h3>التوثيق داخل النص</h3>
+<div id="intext" class="output"></div>
+
+<h3>قائمة المراجع</h3>
+<div id="works" class="output"></div>
 
 </div>
 
 <script>
-function generateCitation() {
+function generate() {
+    let type = document.getElementById("type").value;
+    let ln = document.getElementById("lastName").value || "غير معروف";
+    let fn = document.getElementById("firstName").value;
+    let count = document.getElementById("authorsCount").value;
+    let title = document.getElementById("title").value;
+    let chapter = document.getElementById("chapter").value;
+    let pub = document.getElementById("publisher").value;
+    let year = document.getElementById("year").value;
+    let page = document.getElementById("page").value;
+    let url = document.getElementById("url").value;
 
-    const type = document.getElementById("sourceType").value;
-    const last = document.getElementById("lastName").value.trim();
-    const first = document.getElementById("firstName").value.trim();
-    const count = document.getElementById("authorCount").value;
-    const title = document.getElementById("title").value.trim();
-    const publisher = document.getElementById("publisher").value.trim();
-    const year = document.getElementById("year").value.trim();
-    const page = document.getElementById("page").value.trim();
-
-    // ===== In-text citation =====
-    let inTextAuthor = last;
-    if (count === "3") inTextAuthor += " وآخرون";
-    let inText = page ? `(${inTextAuthor} ${page})` : `(${inTextAuthor})`;
-    document.getElementById("inText").textContent = inText;
-
-    // ===== Works Cited =====
-    let authorWC = "";
-
-    if (type === "newspaper") {
-        authorWC = `${first} ${last}`;
-    } else {
-        authorWC = `${last}، ${first}`;
-    }
-
+    /* ===== In-text ===== */
+    let inText = "";
     if (count === "3") {
-        authorWC += "، وآخرون";
+        inText = page ? `(${ln} وآخرون ${page})` : `(${ln} وآخرون)`;
+    } else {
+        inText = page ? `(${ln} ${page})` : `(${ln})`;
     }
 
-    let wc = `${authorWC}. "${title}." ${publisher}, ${year}.`;
-    document.getElementById("worksCited").textContent = wc;
+    document.getElementById("intext").textContent = inText;
+
+    /* ===== Works Cited ===== */
+    let authorWC = "";
+    if (count === "3") {
+        authorWC = `${ln}، ${fn}، وآخرون.`;
+    } else {
+        authorWC = `${ln}، ${fn}.`;
+    }
+
+    let works = "";
+
+    switch(type) {
+        case "book":
+            works = `${authorWC} <em>${title}</em>. ${pub}، ${year}.`;
+            break;
+
+        case "chapter":
+            works = `${authorWC} "${chapter}." <em>${title}</em>. ${pub}، ${year}.`;
+            break;
+
+        case "ebook":
+            works = `${authorWC} <em>${title}</em>. ${year}. ${url}.`;
+            break;
+
+        case "article":
+            works = `${authorWC} "${chapter}." <em>${title}</em>، ${year}.`;
+            break;
+
+        case "website":
+            works = `${authorWC} "${chapter}." <em>${title}</em>، ${year}، ${url}.`;
+            break;
+
+        case "tweet":
+            works = `${authorWC} "${chapter}." تويتر، ${year}، ${url}.`;
+            break;
+
+        case "video":
+            works = `<em>${title}</em>. إخراج ${fn} ${ln}، ${pub}، ${year}.`;
+            break;
+    }
+
+    document.getElementById("works").innerHTML = works;
 }
 </script>
 
