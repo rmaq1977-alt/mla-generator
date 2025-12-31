@@ -56,27 +56,23 @@ small { color:#555; }
 
 <h1>مولّد التوثيق الأكاديمي – MLA الإصدار التاسع</h1>
 
-<!-- ================= نوع المرجع ================= -->
 <label>نوع المرجع</label>
-<select id="sourceType" onchange="toggleFields()">
+<select id="sourceType" onchange="toggleEdition()">
     <option value="book">كتاب</option>
     <option value="chapter">فصل من كتاب</option>
-    <option value="article">مقال / مجلة</option>
+    <option value="article">مقال</option>
     <option value="website">صفحة ويب</option>
-    <option value="blog">تدوينة (Blog)</option>
-    <option value="video">مادة مرئية / فيديو</option>
+    <option value="blog">مدونة</option>
 </select>
 
-<!-- ================= نوع الاستخدام ================= -->
 <label>نوع الاستخدام</label>
 <select id="citationType">
-    <option value="paraphrase">إعادة صياغة (اقتباس غير مباشر)</option>
+    <option value="paraphrase">إعادة صياغة</option>
     <option value="quote">اقتباس مباشر</option>
 </select>
 
-<!-- ================= المؤلف ================= -->
 <label>هل المؤلف معروف؟</label>
-<select id="authorKnown" onchange="toggleAuthor()">
+<select id="authorKnown" onchange="toggleAuthors()">
     <option value="yes">نعم</option>
     <option value="no">لا</option>
 </select>
@@ -92,25 +88,24 @@ small { color:#555; }
 <div id="authors"></div>
 </div>
 
-<!-- ================= العناوين ================= -->
 <label>عنوان الصفحة / الفصل / المقال</label>
 <input id="chapter">
 
-<label>عنوان المصدر الرئيسي <small>(الكتاب / الموقع / المجلة)</small></label>
+<label>عنوان المصدر الرئيسي</label>
 <input id="title">
 
 <div id="editionField">
-<label>الطبعة <small>(إن لم تكن الأولى)</small></label>
-<input id="edition" placeholder="مثال: 2nd ed.">
+<label>الطبعة (إن لم تكن الأولى)</label>
+<input id="edition">
 </div>
 
-<label>الناشر / راعي الموقع</label>
+<label>الناشر / الموقع</label>
 <input id="publisher">
 
-<label>سنة أو تاريخ النشر</label>
+<label>سنة النشر</label>
 <input id="year">
 
-<label>رقم الصفحة <small>(إلزامي للاقتباس المباشر)</small></label>
+<label>رقم الصفحة</label>
 <input id="page">
 
 <label>الرابط (URL)</label>
@@ -118,80 +113,84 @@ small { color:#555; }
 
 <button onclick="generate()">توليد التوثيق</button>
 
-<h3>التوثيق داخل النص (In-text citation)</h3>
+<h3>التوثيق داخل النص</h3>
 <div id="intext" class="output"></div>
 
-<h3>قائمة المراجع (Works Cited)</h3>
+<h3>قائمة المراجع</h3>
 <div id="works" class="output"></div>
 
 </div>
 
 <script>
-function toggleFields(){
-    let type = document.getElementById("sourceType").value;
+function toggleEdition(){
+    let t=document.getElementById("sourceType").value;
     document.getElementById("editionField").style.display =
-        (type === "book" || type === "chapter") ? "block" : "none";
+        (t==="book"||t==="chapter")?"block":"none";
 }
-
-function toggleAuthor(){
-    let known = document.getElementById("authorKnown").value;
+function toggleAuthors(){
     document.getElementById("authorsSection").style.display =
-        known === "yes" ? "block" : "none";
+        document.getElementById("authorKnown").value==="yes"?"block":"none";
 }
-
 function buildAuthors(){
-    let count = document.getElementById("authorsCount").value;
-    let div = document.getElementById("authors");
-    div.innerHTML = "";
-    let n = count === "3" ? 1 : count;
-
+    let c=document.getElementById("authorsCount").value;
+    let d=document.getElementById("authors");
+    d.innerHTML="";
+    let n=(c==="3")?1:c;
     for(let i=1;i<=n;i++){
-        div.innerHTML += `
-        <label>اسم عائلة المؤلف ${i}</label>
+        d.innerHTML+=`
+        <label>اسم العائلة للمؤلف ${i}</label>
         <input class="ln">
         <label>الاسم الأول للمؤلف ${i}</label>
-        <input class="fn">
-        `;
+        <input class="fn">`;
     }
 }
-toggleFields(); toggleAuthor(); buildAuthors();
+toggleEdition(); toggleAuthors(); buildAuthors();
 
 function generate(){
-    let sourceType = document.getElementById("sourceType").value;
-    let citationType = document.getElementById("citationType").value;
-    let authorKnown = document.getElementById("authorKnown").value;
-    let chapter = document.getElementById("chapter").value;
-    let title = document.getElementById("title").value;
-    let edition = document.getElementById("edition").value;
-    let pub = document.getElementById("publisher").value;
-    let year = document.getElementById("year").value;
-    let page = document.getElementById("page").value;
-    let url = document.getElementById("url").value;
-
-    let ln = document.querySelector(".ln")?.value || "";
-    let fn = document.querySelector(".fn")?.value || "";
+    let citationType=document.getElementById("citationType").value;
+    let authorKnown=document.getElementById("authorKnown").value;
+    let count=document.getElementById("authorsCount").value;
+    let ln=document.querySelector(".ln")?.value||"";
+    let fn=document.querySelector(".fn")?.value||"";
+    let page=document.getElementById("page").value;
+    let chapter=document.getElementById("chapter").value;
+    let title=document.getElementById("title").value;
+    let publisher=document.getElementById("publisher").value;
+    let year=document.getElementById("year").value;
+    let edition=document.getElementById("edition").value;
+    let url=document.getElementById("url").value;
 
     if(citationType==="quote" && !page){
-        alert("يجب إدخال رقم الصفحة عند الاقتباس المباشر.");
+        alert("رقم الصفحة إلزامي في الاقتباس المباشر.");
         return;
     }
 
-    let inTextAuthor = authorKnown==="yes" ? `${ln} وآخرون` : `"${chapter}"`;
+    let inTextAuthor="";
+    let worksAuthor="";
+
+    if(authorKnown==="yes"){
+        if(count==="1"){
+            inTextAuthor=ln;
+            worksAuthor=`${ln}، ${fn}.`;
+        }
+        else if(count==="2"){
+            inTextAuthor=`${ln} و${document.querySelectorAll(".ln")[1].value}`;
+            worksAuthor=`${ln}، ${fn}، و ${document.querySelectorAll(".fn")[1].value} ${document.querySelectorAll(".ln")[1].value}.`;
+        }
+        else{
+            inTextAuthor=`${ln} وآخرون`;
+            worksAuthor=`${ln}، ${fn}، وآخرون.`;
+        }
+    } else {
+        inTextAuthor=`"${chapter}"`;
+    }
 
     document.getElementById("intext").textContent =
         citationType==="quote" ? `(${inTextAuthor} ${page})`
         : page ? `(${inTextAuthor} ${page})` : `(${inTextAuthor})`;
 
-    let works="";
-    if(sourceType==="book"){
-        works = `${ln}، ${fn}، وآخرون. <em>${title}</em>. ${edition?edition+", ":""}${pub}، ${year}.`;
-    } else if(sourceType==="website" && authorKnown==="no"){
-        works = `"${chapter}." <em>${title}</em>، ${pub}، ${year}، ${url}.`;
-    } else {
-        works = `${ln}، ${fn}. "${chapter}." <em>${title}</em>، ${year}، ${url}.`;
-    }
-
-    document.getElementById("works").innerHTML = works;
+    document.getElementById("works").innerHTML =
+        `${worksAuthor} <em>${title}</em>. ${edition?edition+", ":""}${publisher}، ${year}. ${url}`;
 }
 </script>
 
